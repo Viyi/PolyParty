@@ -17,4 +17,4 @@ app.include_router(users.router, prefix="/auth", tags=["Authentication"])
 
 @app.get("/")
 def root():
-    return {"message": "API is running"}
+    return {"message": "API is running!"}

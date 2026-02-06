@@ -15,10 +15,12 @@ def register_user(user_data: UserCreate, session: Session = Depends(get_session)
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
 
+    hashed = hash_password(user_data.password)
+
     new_user = User(
         username=user_data.username,
-        hashed_password=hash_password(user_data.password),
-        balance=user_data.balance,
+        hashed_password=hashed,
+        balance=100,
     )
     session.add(new_user)
     session.commit()

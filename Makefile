@@ -1,4 +1,4 @@
 .PHONY: dev
 
 dev:
-	docker compose watch -f dev.docker-compose.yaml
+	docker compose up --watch --build
