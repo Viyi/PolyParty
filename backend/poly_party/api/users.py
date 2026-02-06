@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 from poly_party.db import get_session
 from poly_party.models import User, UserCreate, UserRead
 from poly_party.security import hash_password, verify_password
+from typing import List
 
 router = APIRouter()
 
@@ -37,3 +38,19 @@ def login(user_data: UserCreate, session: Session = Depends(get_session)):
         )
 
     return {"message": "Login successful", "balance": user.balance}
+
+
+@router.get("/users", response_model=List[UserRead])
+def get_users(
+    session: Session = Depends(get_session),
+    # Optional: current_user: User = Depends(get_current_user)
+):
+    """
+    Retrieve all users' usernames and balances.
+    """
+    # 1. Execute a select statement to get all User records
+    users = session.exec(select(User)).all()
+
+    # 2. Return the list. FastAPI/Pydantic will automatically
+    # filter out the hashed_password because of response_model=List[UserRead]
+    return users

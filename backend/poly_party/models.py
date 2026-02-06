@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 
 class UserBase(SQLModel):
     username: str = Field(index=True, unique=True)
-    balance: float = Field(default=0.0)
+    balance: float = Field(default=100.0)
 
 
 class User(UserBase, table=True):
