@@ -1,0 +1,12 @@
+[project]
+name = "polyparty-backend"
+version = "0.1.0"
+description = "It's like polymarket + jackbox"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.128.3",
+    "passlib[bcrypt]>=1.7.4",
+    "sqlmodel>=0.0.32",
+    "uvicorn>=0.40.0",
+]

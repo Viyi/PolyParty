@@ -1,0 +1,36 @@
+services:
+
+  backend:
+    build:
+      context: backend
+      target: development
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: backend/
+          target: /app
+          ignore:
+            - __pycache__/
+        
+        - action: rebuild
+          path: backend/requirements.txt
+  frontend:
+    build:
+      context: frontend
+      target: dev
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: frontend/
+          target: /app
+          ignore:
+            - node_modules/
+         
+        - action: rebuild
+          path: frontend/package.json
