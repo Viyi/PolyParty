@@ -6,20 +6,29 @@
 
     async function login() {
         try{
+            const formData = new URLSearchParams()
+            formData.append("username", username)
+            formData.append("password", password)
+
             const response = await fetch('http://10.0.0.165:8051/auth/login',{
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: JSON.stringify({username: username, password: password})}
+                body: formData.toString()}
             )
 
             if (!response.ok) {
                 throw new Error('login failed')
             }
 
-            const data = await response.json();e
+            const data = await response.json();
             console.log(data)
+
+             // Save JWT and user id
+            localStorage.setItem("access_token", data.access_token); // assuming FastAPI returns access_token
+            localStorage.setItem("userId", data.user_id); // or data.id depending on backend
+            goto("/user/")
         } catch(err){
             console.error(err)
         }
