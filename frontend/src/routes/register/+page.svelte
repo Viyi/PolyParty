@@ -1,6 +1,7 @@
 <script>
     import { goto } from "$app/navigation";
     import "../../app.css"
+	import { API_HOST } from "../../conts";
 
     let username = ''
     let password = ''
@@ -8,7 +9,7 @@
 
     async function login() {
         try{
-            const response = await fetch('http://10.0.0.165:8051/auth/register',{
+            const response = await fetch(`${API_HOST}/auth/register`,{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

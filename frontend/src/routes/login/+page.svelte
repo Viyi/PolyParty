@@ -1,6 +1,7 @@
 <script>
     import { goto } from "$app/navigation";
     import "../../app.css"
+	import { API_HOST } from "../../conts";
 
     let username = ''
     let password = ''
@@ -11,7 +12,7 @@
             formData.append("username", username)
             formData.append("password", password)
 
-            const response = await fetch('http://10.0.0.165:8051/auth/login',{
+            const response = await fetch(`${API_HOST}/auth/login`,{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
