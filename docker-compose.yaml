@@ -5,7 +5,7 @@ services:
       context: backend
       target: development
     ports:
-      - ${BACKEND_PORT:-8051}:8000
+      - 8051:8000
     environment:
       - ENV=development
     develop:
@@ -23,7 +23,7 @@ services:
       context: frontend
       target: dev
     ports:
-      - ${FRONTEND_PORT:-8050}:5173
+      - 8050:5173
     develop:
       watch:
         - action: sync
