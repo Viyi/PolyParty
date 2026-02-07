@@ -1,5 +1,10 @@
 {
 	"files.associations": {
 		"*.css": "tailwindcss"
-	}
+	},
+	"python.analysis.importFormat": "absolute",
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.ruff": "always"
+	},
+	"ruff.organizeImports": true
 }
