@@ -1,5 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
+    import "../../app.css"
 
     let username = ''
     let password = ''
@@ -27,7 +28,7 @@
 
              // Save JWT and user id
             localStorage.setItem("access_token", data.access_token); // assuming FastAPI returns access_token
-            localStorage.setItem("userId", data.user_id); // or data.id depending on backend
+            localStorage.setItem("user_id", data.user_id); // or data.id depending on backend
             goto("/user/")
         } catch(err){
             console.error(err)
@@ -36,9 +37,12 @@
     }
 </script>
 
-<div style="width: 100vw; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px">
-    <div style="width: 30%; display: flex; flex-direction: column; justify-content: start; align-items: start; gap: 8px">
-        <h1>Login</h1>
+<div class="parent-container">
+    <div class="parent-subcontainer">
+        <div class="title-container">
+            <button class="back-btn" on:click={() => goto('/')}>back</button>
+            <h1 class="title">Login</h1>
+        </div>
         <label>Username</label>
         <input bind:value={username} style="max-width: 200px; min-width: 200px;">
         <label>Password</label>

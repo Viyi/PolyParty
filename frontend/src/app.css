@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.parent-container {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px
+}
+
+.parent-subcontainer {
+    width: 200px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: start; 
+    align-items: start; 
+    gap: 8px
+}
+
+.title-container {
+    position: relative;
+    width: 100%;
+}
+
+.back-btn {
+    position: absolute;
+    left: -10%;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.title {
+    width: 100%; 
+    text-align: center;
+}
+
