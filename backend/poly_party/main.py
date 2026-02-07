@@ -1,11 +1,9 @@
-from fastapi import FastAPI
-from poly_party.db import create_db_and_tables
-from poly_party.api import users, auth
-from poly_party.models import UserCreate
-from poly_party.db import get_session
-from fastapi import HTTPException
-from poly_party.config import settings
+from fastapi import FastAPI, HTTPException
 
+from poly_party.api import auth, events, users
+from poly_party.config import settings
+from poly_party.db import create_db_and_tables, get_session
+from poly_party.models import UserCreate
 
 app = FastAPI(title="FastAPI + SQLModel Auth")
 
@@ -27,6 +25,7 @@ def on_startup():
 # Include Routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(events.router, prefix="/events", tags=["Events"])
 
 
 @app.get("/")
