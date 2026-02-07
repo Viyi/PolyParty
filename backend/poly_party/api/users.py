@@ -22,8 +22,21 @@ def get_users(
 
 # 3. View a specific User and all their tied Shares
 @router.get("/{user_id}/shares", response_model=UserReadWithShares)
-def get_user_shares(user_id: int, session: Session = Depends(get_session)):
+def get_user_shares(
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.get("/current", response_model=UserReadWithShares)
+def get_user(
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    return current_user

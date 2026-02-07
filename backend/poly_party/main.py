@@ -3,7 +3,6 @@ from fastapi import FastAPI, HTTPException
 from poly_party.api import auth, events, users
 from poly_party.config import settings
 from poly_party.db import create_db_and_tables, get_session
-from poly_party.models import UserCreate
 
 app = FastAPI(title="FastAPI + SQLModel Auth")
 
@@ -15,8 +14,8 @@ def on_startup():
     session = next(get_session())
 
     try:
-        auth.register_user(
-            UserCreate(username="admin", password=settings.admin_pass), session=session
+        auth.create_admin(
+            username="admin", password=settings.admin_pass, session=session
         )
     except HTTPException:
         pass

@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-# --- 1. ENUMS AND CONSTANTS ---
+# --- 1. ENUMS ---
 
 
 class eventType(str, Enum):
@@ -13,7 +13,28 @@ class eventType(str, Enum):
     MULTIPLE_CHOICE = "multiple-choice"
 
 
-# --- 2. USER MODELS ---
+# --- 2. OUTCOME MODELS ---
+
+
+class OutcomeBase(SQLModel):
+    description: str
+    value: int
+    cost: float = Field(default=0.0)
+    event_id: Optional[str] = Field(default=None, foreign_key="event.id")
+
+
+class Outcome(OutcomeBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    # Relationship back to the Event
+    event: "Event" = Relationship(back_populates="outcomes")
+
+
+class OutcomeRead(OutcomeBase):
+    id: int
+
+
+# --- 3. USER MODELS ---
 
 
 class UserBase(SQLModel):
@@ -24,8 +45,9 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
-    admin: Optional[bool] = Field(default=False)
+    admin: bool = Field(default=False)
 
+    # Relationships
     shares: List["Share"] = Relationship(back_populates="user")
 
 
@@ -37,11 +59,10 @@ class UserRead(UserBase):
     id: int
 
 
-# --- 3. EVENT MODELS ---
+# --- 4. EVENT MODELS ---
 
 
 class EventBase(SQLModel):
-    id: str = Field(primary_key=True)
     title: str
     start_time: datetime
     end_time: datetime
@@ -52,11 +73,17 @@ class EventBase(SQLModel):
 
 
 class Event(EventBase, table=True):
-    # Relationship to the database table
+    id: Optional[int] = Field(default=None, primary_key=True)
+
     shares: List["Share"] = Relationship(back_populates="event")
+    outcomes: List["Outcome"] = Relationship(back_populates="event")
 
 
-# --- 4. SHARE MODELS ---
+class EventCreate(EventBase):
+    outcomes: List[OutcomeBase]
+
+
+# --- 5. SHARE MODELS ---
 
 
 class ShareBase(SQLModel):
@@ -69,18 +96,16 @@ class ShareBase(SQLModel):
 
 
 class Share(ShareBase, table=True):
+    # Relationships
     event: Event = Relationship(back_populates="shares")
     user: User = Relationship(back_populates="shares")
 
 
-# --- 5. READ SCHEMAS (With Relationships) ---
-# These are used as 'response_model' in your routes to show nested data
-
-
 class ShareRead(ShareBase):
-    """Simple share view without nested user/event to prevent recursion."""
-
     pass
+
+
+# --- 6. NESTED READ SCHEMAS (For API Responses) ---
 
 
 class UserReadWithShares(UserRead):
@@ -88,4 +113,16 @@ class UserReadWithShares(UserRead):
 
 
 class EventReadWithShares(EventBase):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    outcomes: List[OutcomeRead] = []
     shares: List[ShareRead] = []
+
+
+# --- 7. FINALIZATION ---
+# This fixes the "not fully defined" errors by resolving string references
+User.model_rebuild()
+Event.model_rebuild()
+Share.model_rebuild()
+Outcome.model_rebuild()
+UserReadWithShares.model_rebuild()
+EventReadWithShares.model_rebuild()
