@@ -1,9 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+import uuid
+from typing import List
 
-from poly_party.api.auth import get_session
-from poly_party.models import Event, EventCreate, EventReadWithShares, Outcome, User
+from fastapi import APIRouter, Body, Depends, HTTPException
+from poly_party.db import get_session
+from poly_party.models import (
+    Event,
+    EventCreate,
+    EventReadWithShares,
+    Outcome,
+    Share,
+    ShareRead,
+    User,
+)
 from poly_party.security import get_current_user
+from sqlmodel import Session, select
 
 router = APIRouter()
 
@@ -54,9 +64,54 @@ def create_event(
     session.refresh(db_event)
     return db_event
 
-@router.post("/bet", response_model=Event)
-def bet_event(
-    event_data: Event,
+
+@router.post("/bet", response_model=List[ShareRead])
+def place_bet(
+    event_id: int,
+    quantity: int = Body(..., embed=True),
+    price_per_share: float = Body(..., embed=True),
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
-):
+) -> list[ShareRead]:
+    db_event: Event | None = session.get(Event, event_id)
+    if not db_event or not db_event.id:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    if db_event and db_event.finalized:
+        raise HTTPException(status_code=400, detail="Event is already finalized")
+
+    # 2. Check User Balance
+    total_cost = quantity * price_per_share
+    if current_user.balance < total_cost:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    # 3. Deduct balance from user
+    current_user.balance -= total_cost
+    session.add(current_user)
+
+    # 4. Create n number of Share records
+    new_shares: list[Share] = []
+    for _ in range(quantity):
+        share = Share(
+            id=str(uuid.uuid4()),  # Generating unique IDs for each share
+            value=db_event.value,  # Inheriting value logic from the event
+            wager=price_per_share,
+            event_id=db_event.id,
+            user_id=current_user.id,
+            timestamp=datetime.utcnow(),
+        )
+        session.add(share)
+        new_shares.append(share)
+
+    # 5. Commit the transaction
+    try:
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise HTTPException(status_code=500, detail="Transaction failed")
+
+    # Refresh to get the final state
+    for share in new_shares:
+        session.refresh(share)
+
+    return new_shares

@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
@@ -24,26 +25,37 @@ class OutcomeBase(SQLModel):
 
 
 class Outcome(OutcomeBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
+    )
 
     # Relationship back to the Event
     event: "Event" = Relationship(back_populates="outcomes")
 
 
 class OutcomeRead(OutcomeBase):
-    id: int
+    id: str
 
 
 # --- 3. USER MODELS ---
 
 
+def get_random_icon():
+    random_seed = uuid.uuid4().hex
+    return f"https://api.dicebear.com/9.x/bottts/svg?seed={random_seed}"
+
+
 class UserBase(SQLModel):
     username: str = Field(index=True, unique=True)
     balance: float = Field(default=100.0)
+    # default_factory calls the function every time a new User is initialized
+    icon_url: str = Field(default_factory=get_random_icon)
 
 
 class User(UserBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
+    )
     hashed_password: str
     admin: bool = Field(default=False)
 
@@ -56,7 +68,7 @@ class UserCreate(UserBase):
 
 
 class UserRead(UserBase):
-    id: int
+    id: str
 
 
 # --- 4. EVENT MODELS ---
@@ -73,7 +85,9 @@ class EventBase(SQLModel):
 
 
 class Event(EventBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
+    )
 
     shares: List["Share"] = Relationship(back_populates="event")
     outcomes: List["Outcome"] = Relationship(back_populates="event")
@@ -87,12 +101,14 @@ class EventCreate(EventBase):
 
 
 class ShareBase(SQLModel):
-    id: str = Field(primary_key=True)
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
+    )
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     value: int
     wager: float
     event_id: str = Field(foreign_key="event.id")
-    user_id: int = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="user.id")
 
 
 class Share(ShareBase, table=True):
@@ -113,7 +129,7 @@ class UserReadWithShares(UserRead):
 
 
 class EventReadWithShares(EventBase):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: str
     outcomes: List[OutcomeRead] = []
     shares: List[ShareRead] = []
 

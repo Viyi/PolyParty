@@ -1,13 +1,12 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
-
 from poly_party.db import get_session
 from poly_party.models import User, UserRead, UserReadWithShares
 from poly_party.security import (
     get_current_user,
 )
+from sqlmodel import Session, select
 
 router = APIRouter()
 
@@ -35,7 +34,6 @@ def get_user_shares(
 
 @router.get("/current", response_model=UserReadWithShares)
 def get_user(
-    user_id: int,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):

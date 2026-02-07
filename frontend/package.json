@@ -11,7 +11,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"openapi-ts": "openapi-ts --client"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.2",
@@ -40,5 +41,8 @@
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.54.0",
 		"vite": "^7.3.1"
+	},
+	"dependencies": {
+		"@hey-api/openapi-ts": "0.92.3"
 	}
 }
