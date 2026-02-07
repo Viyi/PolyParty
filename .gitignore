@@ -1,2 +1,4 @@
 backend/database.db
 __pycache__
+.env
+frontend/.vscode/settings.json

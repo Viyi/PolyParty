@@ -8,6 +8,8 @@ services:
       - 8051:8000
     environment:
       - ENV=development
+    env_file:
+      - .env
     develop:
       watch:
         - action: sync
@@ -17,7 +19,7 @@ services:
             - __pycache__/
         
         - action: rebuild
-          path: backend/requirements.txt
+          path: backend/pyproject.toml
   frontend:
     build:
       context: frontend
