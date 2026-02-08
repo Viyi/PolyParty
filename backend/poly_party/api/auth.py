@@ -1,7 +1,10 @@
+import random
+import string
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from poly_party.db import get_session
-from poly_party.models import User, UserCreate, UserRead
+from poly_party.models import Token, TokenBase, User, UserCreate, UserRead
 from poly_party.security import (
     create_access_token,
     get_current_user,
@@ -19,7 +22,24 @@ def register_user(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    raise_not_admin(current_user)
+    admin = check_admin(current_user)
+
+    if not admin:
+        existing_token = session.exec(
+            select(Token).where(
+                (Token.token == user_data.token) & (Token.used == False)
+            )
+        ).first()
+        if not existing_token:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Register token is invalid",
+            )
+            return
+        existing_token.used = True
+        session.add(existing_token)
+        session.commit()
+        session.refresh(existing_token)
 
     existing_user = session.exec(
         select(User).where(User.username == user_data.username)
@@ -40,6 +60,39 @@ def register_user(
     session.commit()
     session.refresh(new_user)
     return new_user
+
+
+def random_token(length=4):
+    chars = string.ascii_letters + string.digits
+    return "".join(random.choice(chars) for _ in range(length))
+
+
+@router.get("/register/token", response_model=TokenBase)
+def register_new_token(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    raise_not_admin(current_user)
+
+    unique = False
+    token = ""
+
+    while not unique:
+        new_token = random_token()
+
+        existing_token = session.exec(
+            select(Token).where(Token.token == new_token)
+        ).first()
+        print(existing_token)
+        if not existing_token:
+            token = new_token
+            unique = True
+
+    new_token = Token(token=token, used=False)
+    session.add(new_token)
+    session.commit()
+    session.refresh(new_token)
+    return new_token
 
 
 @router.post("/login")
@@ -79,6 +132,10 @@ def create_user_locally(username: str, password: str, admin: bool, session: Sess
     session.commit()
     session.refresh(new_user)
     return new_user
+
+
+def check_admin(current_user: User) -> bool:
+    return current_user.admin
 
 
 def raise_not_admin(current_user: User):
