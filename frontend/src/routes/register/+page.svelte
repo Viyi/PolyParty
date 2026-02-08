@@ -2,31 +2,38 @@
     import { goto } from "$app/navigation";
     import "../../app.css"
 	import { API_HOST } from "../../conts";
+	import { client } from '../../client/client.gen';
+
 
     let username = ''
     let password = ''
     let user_id = null
 
-    async function login() {
+    async function register() {
         try{
+            // set up POST object
+            let body = {}
+            body["username"] = username
+            body["password"] = password
+            body["balance"] = 100
+            body["icon_url"] = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.pVwLWcMokx49OUsH73TEZwHaGJ%3Fpid%3DApi&f=1&ipt=514c01055b26b842f1dec963e71778674eb06cdb6d48f6803f6b04e96bb2ea25&ipo=images"
+
             const response = await fetch(`${API_HOST}/auth/register`,{
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`
                 },
-                body: JSON.stringify({username: username, balance: 100, password: password})}
-            )
+                body: JSON.stringify(body)
+            })
 
             if (!response.ok) {
-                throw new Error('login failed')
+                throw new Error('register failed')
             }
 
             const data = await response.json();
-            console.log(data)
             user_id = data.balance
-            localStorage.setItem("access_token", data.access_token); // assuming FastAPI returns access_token
-            localStorage.setItem("user_id", data.user_id); // or data.id depending on backend
-            goto(`/user/`)
+            goto(`/login/`)
         } catch(err){
             console.error(err)
         }
@@ -40,10 +47,23 @@
             <button class="back-btn" on:click={() => goto('/')}>back</button>
             <h1 class="title">Register</h1>
         </div>
-        <label>Username</label>
-        <input bind:value={username} style="max-width: 200px; min-width: 200px;">
-        <label>Password</label>
-        <input bind:value={password} style="max-width: 200px; min-width: 200px;">
-        <button on:click={login} style="max-width: 200px; min-width: 200px;">Login</button>
+        <form on:submit={register} class="login-form">
+            <label for="username">Username</label>
+            <input 
+                id="username"
+                bind:value={username}
+                type="text"
+                required 
+                style="max-width: 200px; min-width: 200px;"
+            >
+            <label for="password">Password</label>
+            <input 
+                id="password"
+                bind:value={password}
+                type="password"
+                required 
+                style="max-width: 200px; min-width: 200px;">
+            <button type="submit" style="max-width: 200px; min-width: 200px;">Register</button>
+        </form>
     </div>
 </div>
