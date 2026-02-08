@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
+import type { CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, RegisterNewTokenAuthRegisterTokenGetData, RegisterNewTokenAuthRegisterTokenGetResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -29,6 +29,15 @@ export const registerUserAuthRegisterPost = <ThrowOnError extends boolean = fals
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Register New Token
+ */
+export const registerNewTokenAuthRegisterTokenGet = <ThrowOnError extends boolean = false>(options?: Options<RegisterNewTokenAuthRegisterTokenGetData, ThrowOnError>) => (options?.client ?? client).get<RegisterNewTokenAuthRegisterTokenGetResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/auth/register/token',
+    ...options
 });
 
 /**
