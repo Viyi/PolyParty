@@ -13,4 +13,4 @@ import type { ClientOptions as ClientOptions2 } from './types.gen';
  */
 export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (override?: Config<ClientOptions & T>) => Config<Required<ClientOptions> & T>;
 
-export const client = createClient(createConfig<ClientOptions2>({ baseUrl: `http://${import.meta.env.VITE_API_URL}:8051` }));
+export const client = createClient(createConfig<ClientOptions2>({ baseUrl: 'http://10.0.0.165:8051' }));

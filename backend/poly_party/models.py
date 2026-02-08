@@ -126,6 +126,7 @@ class ShareRead(ShareBase):
 
 class UserReadWithShares(UserRead):
     shares: List[ShareRead] = []
+    admin: bool = Field(default=False)
 
 
 class EventReadWithShares(EventBase):
