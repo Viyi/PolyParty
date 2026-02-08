@@ -66,12 +66,15 @@
     }
     
     async function registerNewToken() {
+        let access_token = localStorage.getItem("access_token")
+        access_token = access_token ? access_token : ""
+        
         try{
             const response = await fetch(`${API_HOST}/auth/register/token`,{
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+                    'Authorization': `Bearer ${access_token}`
                 }
             })
             

@@ -14,6 +14,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
 def hash_password(password: str) -> str:
@@ -39,18 +40,34 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
-):
+def decode_jwt_and_get_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session), raise_exception=True) -> User:
     try:
         payload = jwt.decode(token, settings.secret_phrase, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        if username is None and raise_exception:
             raise HTTPException(status_code=401, detail="Invalid token")
+        elif username is None and not raise_exception:
+            return None
     except:
-        raise HTTPException(status_code=401, detail="Could not validate credentials")
+        if raise_exception:
+            raise HTTPException(status_code=401, detail="Could not validate credentials")
+        else:
+            return None
 
     user = session.exec(select(User).where(User.username == username)).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
+):
+    return decode_jwt_and_get_user(token, session)
+
+def get_current_user_optional(
+    token: str | None = Depends(oauth2_scheme_optional), session: Session = Depends(get_session)
+) -> User | None:
+    if not token:
+        return None
+    return decode_jwt_and_get_user(token, session, raise_exception=False)

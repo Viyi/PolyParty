@@ -8,6 +8,7 @@ from poly_party.models import Token, TokenBase, User, UserCreate, UserRead
 from poly_party.security import (
     create_access_token,
     get_current_user,
+    get_current_user_optional,
     hash_password,
     verify_password,
 )
@@ -15,38 +16,24 @@ from sqlmodel import Session, select
 
 router = APIRouter()
 
-
-@router.post("/register", response_model=UserRead)
-def register_user(
-    user_data: UserCreate,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
-):
-    admin = check_admin(current_user)
-
-    if not admin:
-        existing_token = session.exec(
-            select(Token).where(
-                (Token.token == user_data.token) & (Token.used == False)
-            )
-        ).first()
-        if not existing_token:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Register token is invalid",
-            )
-            return
-        existing_token.used = True
-        session.add(existing_token)
-        session.commit()
-        session.refresh(existing_token)
-
-    existing_user = session.exec(
-        select(User).where(User.username == user_data.username)
+def check_and_update_registration_token(user_data: UserCreate, session: Session):
+    existing_token = session.exec(
+        select(Token).where(
+            (Token.token == user_data.token) & (Token.used == False)
+        )
     ).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+    if not existing_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Register token is invalid",
+        )
+        return
+    existing_token.used = True
+    session.add(existing_token)
+    session.commit()
+    session.refresh(existing_token)
 
+def create_new_user(user_data: UserCreate, session: Session) -> User:
     hashed = hash_password(user_data.password)
 
     new_user = User(
@@ -60,6 +47,27 @@ def register_user(
     session.commit()
     session.refresh(new_user)
     return new_user
+
+
+@router.post("/register", response_model=UserRead)
+def register_user(
+    user_data: UserCreate,
+    session: Session = Depends(get_session),
+    current_user: User | None = Depends(get_current_user_optional),
+) -> User:
+    admin = check_admin(current_user) if current_user else False
+
+    if not admin:
+        check_and_update_registration_token(user_data, session)
+
+    existing_user = session.exec(
+        select(User).where(User.username == user_data.username)
+    ).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+
+    
+    return create_new_user(user_data, session)
 
 
 def random_token(length=4):
