@@ -67,7 +67,7 @@ def create_event(
             Outcome.model_validate(outcome.model_dump())
             for outcome in event_data.outcomes
         ]
-
+        print(event_data.outcomes)
     session.add(db_event)
     session.commit()
     session.refresh(db_event)

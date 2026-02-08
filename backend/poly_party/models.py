@@ -20,7 +20,7 @@ class eventType(str, Enum):
 class OutcomeBase(SQLModel):
     description: str
     value: int
-    cost: float = Field(default=0.0)
+    cost: float = Field(default=0.50)
     event_id: str | None = Field(default=None, foreign_key="event.id")
 
 
@@ -88,9 +88,11 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     id: str
 
+
 class IconCreate(SQLModel):
     icon_url: str
     random: bool
+
 
 # --- 4. EVENT MODELS ---
 

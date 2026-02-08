@@ -108,10 +108,30 @@
 			modalRef?.close();
 		}
 	});
+
+	import CreateEventModal from '../components/CreateEvent.svelte';
+
+	let createModal = $state<ReturnType<typeof CreateEventModal>>();
+
+	function handleEventCreated(newEvent: dbEvent) {
+		events = [newEvent, ...events];
+	}
 </script>
 
 <div class="p-4 w-full overflow-x-auto">
 	<h2 class="text-2xl font-bold mb-4">Events</h2>
+	<div class="p-4 w-full overflow-x-auto">
+		<div class="mb-6 flex items-center justify-between">
+			<h2 class="text-2xl font-bold">Events</h2>
+			{#if admin}
+				<button class="btn btn-primary btn-sm" onclick={() => createModal.show()}>
+					+ New Event
+				</button>
+			{/if}
+		</div>
+
+		<CreateEventModal bind:this={createModal} onSuccess={handleEventCreated} />
+	</div>
 
 	{#if loading}
 		<span class="loading loading-dots loading-lg"></span>
