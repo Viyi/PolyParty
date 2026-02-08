@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getUsersUsersGet } from '../../client';
 	import type { UserRead } from '../../client';
+	import UserIcon from './UserIcon.svelte';
 
 	let users = $state<UserRead[]>([]);
 	let loading = $state(true);
@@ -32,15 +33,7 @@
 			{#each users as user, i (user.id)}
 				<tr class="hover:bg-base-200/50 transition-colors">
 					<td>
-						<div class="icon-container">
-							{#if user.icon_url}
-								<img src={user.icon_url} alt="Avatar" loading="lazy" />
-							{:else}
-								<div class="placeholder-circle">
-									{user.username.charAt(0).toUpperCase()}
-								</div>
-							{/if}
-						</div>
+						<UserIcon user_icon={user.icon_url} balance={user.balance ? user.balance : 0} username={user.username}/>
 					</td>
 					<td class="font-bold">{user.username}</td>
 					<td>
@@ -53,29 +46,3 @@
 		</tbody>
 	</table>
 </div>
-
-<style>
-	/* This forces the SVG to actually take up space */
-	.icon-container {
-		width: 40px;
-		height: 40px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 8px;
-		overflow: hidden;
-		background-color: oklch(var(--b2)); /* DaisyUI base-200 color */
-	}
-
-	.icon-container img {
-		width: 100%;
-		height: 100%;
-		display: block;
-		object-fit: cover;
-	}
-
-	.placeholder-circle {
-		font-weight: bold;
-		opacity: 0.5;
-	}
-</style>
