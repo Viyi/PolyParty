@@ -220,3 +220,77 @@ def calculate_outcome_costs(
         temp_total_event_shares += 1
 
     return prices
+
+
+@router.post("/events/{event_id}/close")
+def close_event(
+    event_id: str,
+    winning_value: int = Body(..., embed=True),
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    # 1. Security Check: Only admins should close events
+    if not current_user.admin:
+        raise HTTPException(status_code=403, detail="Only admins can close events")
+
+    # 2. Fetch the Event
+    db_event = session.get(Event, event_id)
+    if not db_event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    if db_event.finalized:
+        raise HTTPException(status_code=400, detail="Event is already finalized")
+
+    # 3. Identify the winning outcome based on the value
+    # We look for the outcome tied to this event that matches the 'winning_value'
+    winning_outcome = next(
+        (o for o in db_event.outcomes if o.value == winning_value), None
+    )
+
+    if not winning_outcome:
+        raise HTTPException(
+            status_code=400, detail=f"No outcome found with value {winning_value}"
+        )
+
+    # 4. Finalize the Event
+    db_event.finalized = True
+    session.add(db_event)
+
+    # 5. Execute Payouts
+    num_payouts = process_payouts(db_event, winning_outcome, session)
+
+    # 6. Commit all changes (Event status + User balances)
+    try:
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise HTTPException(status_code=500, detail="Failed to finalize payouts")
+
+    return {
+        "message": "Event finalized successfully",
+        "winner": winning_outcome.description,
+        "shares_paid": num_payouts,
+    }
+
+
+def process_payouts(event: Event, winning_outcome: Outcome, session: Session):
+    """
+    Identifies all shares for the winning outcome and credits the
+    users' balances.
+    """
+    # 1. Fetch all shares for the winning outcome
+    # We use a join to ensure we get the user objects to update balances
+    statement = select(Share).where(Share.outcome_id == winning_outcome.id)
+    winning_shares = session.exec(statement).all()
+
+    for share in winning_shares:
+        # Payout logic: 1.00 per share
+        # payout_amount = 1.0
+        payout_amount = 1.0
+
+        # Update user balance
+        user = share.user
+        user.balance += payout_amount
+        session.add(user)
+
+    return len(winning_shares)

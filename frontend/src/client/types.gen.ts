@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_close_event_events_events__event_id__close_post
+ */
+export type BodyCloseEventEventsEventsEventIdClosePost = {
+    /**
+     * Winning Value
+     */
+    winning_value: number;
+};
+
+/**
  * Body_login_auth_login_post
  */
 export type BodyLoginAuthLoginPost = {
@@ -311,20 +321,6 @@ export type ShareRead = {
      * Outcome Id
      */
     outcome_id: string;
-};
-
-/**
- * TokenBase
- */
-export type TokenBase = {
-    /**
-     * Token
-     */
-    token: string;
-    /**
-     * Used
-     */
-    used?: boolean;
 };
 
 /**
@@ -713,6 +709,74 @@ export type PlaceBetEventsBetPostResponses = {
 };
 
 export type PlaceBetEventsBetPostResponse = PlaceBetEventsBetPostResponses[keyof PlaceBetEventsBetPostResponses];
+
+export type GetOutcomeCostsEventsBetCostPostData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Num Shares
+         */
+        num_shares: number;
+        /**
+         * Event Id
+         */
+        event_id: string;
+        /**
+         * Outcome Id
+         */
+        outcome_id: string;
+    };
+    url: '/events/bet/cost';
+};
+
+export type GetOutcomeCostsEventsBetCostPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetOutcomeCostsEventsBetCostPostError = GetOutcomeCostsEventsBetCostPostErrors[keyof GetOutcomeCostsEventsBetCostPostErrors];
+
+export type GetOutcomeCostsEventsBetCostPostResponses = {
+    /**
+     * Response Get Outcome Costs Events Bet Cost Post
+     *
+     * Successful Response
+     */
+    200: Array<number>;
+};
+
+export type GetOutcomeCostsEventsBetCostPostResponse = GetOutcomeCostsEventsBetCostPostResponses[keyof GetOutcomeCostsEventsBetCostPostResponses];
+
+export type CloseEventEventsEventsEventIdClosePostData = {
+    body: BodyCloseEventEventsEventsEventIdClosePost;
+    path: {
+        /**
+         * Event Id
+         */
+        event_id: string;
+    };
+    query?: never;
+    url: '/events/events/{event_id}/close';
+};
+
+export type CloseEventEventsEventsEventIdClosePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CloseEventEventsEventsEventIdClosePostError = CloseEventEventsEventsEventIdClosePostErrors[keyof CloseEventEventsEventsEventIdClosePostErrors];
+
+export type CloseEventEventsEventsEventIdClosePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type RootGetData = {
     body?: never;

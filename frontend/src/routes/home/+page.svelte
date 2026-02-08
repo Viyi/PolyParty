@@ -4,6 +4,7 @@
 	import type { Event, UserRead } from '../../client';
 	import LeaderboardTable from '$lib/components/LeaderboardTable.svelte';
 	import EventTable from '$lib/components/EventTable.svelte';
+	import GenericDialog from '$lib/components/GenericDialog.svelte';
 
 	let events = $state<Event[]>([]);
 	let users = $state<UserRead[]>([]);
