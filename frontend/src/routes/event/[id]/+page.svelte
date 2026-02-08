@@ -1,20 +1,26 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getEventsEventsGet } from '../../client';
+	import { getEventDetailsEventsEventIdGet, getEventsEventsGet } from '../../../client';
+    import { page } from '$app/stores';
+
 	// Ensure you import the type that includes outcomes (EventReadWithShares)
 	// or extend the generated Event type.
-	import type { EventReadWithShares as dbEvent } from '../../client';
-	import BetDialog from './BetDialog.svelte';
+	import type { EventReadWithShares as dbEvent } from '../../../client';
     import { goto } from "$app/navigation";
+	import { setAuthParams } from '../../../client/client/utils.gen';
 
-	let events = $state<dbEvent[]>([]);
+	let event = $state<dbEvent>();
 	let loading = $state(true);
 
+    const pageSlug = $page.params.id
+
 	onMount(async () => {
+        console.log(pageSlug)
 		try {
-			const res = await getEventsEventsGet();
+			const res = await getEventDetailsEventsEventIdGet({path:{event_id: pageSlug}});
 			if (res.data) {
-				events = res.data;
+				console.log(res.data)
+				event = res.data;
 			}
 		} finally {
 			loading = false;
@@ -89,16 +95,16 @@
 </script>
 
 <div class="p-4 w-full overflow-x-auto">
-	<h2 class="text-2xl font-bold mb-4">Events</h2>
+	<h2 class="text-2xl font-bold mb-0">{event?.title}</h2>
+	<div class="text-xs opacity-50 mb-8">{event?.description}</div>
 
-	{#if loading}
+	{#if loading || !event}
 		<span class="loading loading-dots loading-lg"></span>
 	{:else}
 		<table class="table w-full">
 			<thead>
 				<tr>
-					<th>Event</th>
-					<th>Description</th>
+					<th>` `</th>
 					<th>Type</th>
 					<th>Potential Outcomes</th>
 					<th>Cutoff</th>
@@ -106,19 +112,14 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each events as e (e.id)}
 					<tr class="hover:bg-base-200/50 transition-colors">
+						<td>{event.description}</td>
 						<td>
-							<div class="font-bold">{e.title}</div>
-							<div class="text-xs opacity-50">{e.id.slice(0, 8)}...</div>
-						</td>
-						<td>{e.description}</td>
-						<td>
-							<span class="badge badge-ghost text-xs uppercase">{e.type}</span>
+							<span class="badge badge-ghost text-xs uppercase">{event.type}</span>
 						</td>
 						<td>
 							<div class="gap-2 max-w-xs flex w-full flex-col">
-								{#each e.outcomes as outcome}
+								{#each event.outcomes as outcome}
 									<div
 										class="gap-4 py-1 border-base-content/5 flex items-center justify-between border-b last:border-0"
 									>
@@ -134,21 +135,16 @@
 							</div>
 						</td>
 						<td>
-							{getRelativeTime(e.start_time, e.end_time)}
+							{getRelativeTime(event.start_time, event.end_time)}
 						</td>
 						<td>
-							{#if e.finalized}
+							{#if event.finalized}
 								<span class="badge badge-error">Closed</span>
 							{:else}
 								<span class="badge badge-success">Open</span>
 							{/if}
 						</td>
-
-						<td>
-							<button onclick={() => openEvent(e.id)}>Open</button>
-						</td>
 					</tr>
-				{/each}
 			</tbody>
 		</table>
 	{/if}
