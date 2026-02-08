@@ -12,6 +12,11 @@ RUN bun install --frozen-lockfile
 # This stage keeps the dev dependencies and runs the dev server
 FROM deps AS dev
 COPY . .
+
+# Copy in domain var
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Expose the SvelteKit dev port and the HMR port
 EXPOSE 5173
 CMD ["bun", "--bun", "run", "dev", "--host", "0.0.0.0"]
