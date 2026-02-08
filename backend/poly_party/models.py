@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
 
+from pydantic import model_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 # --- 1. ENUMS ---
@@ -21,7 +21,7 @@ class OutcomeBase(SQLModel):
     description: str
     value: int
     cost: float = Field(default=0.0)
-    event_id: Optional[str] = Field(default=None, foreign_key="event.id")
+    event_id: str | None = Field(default=None, foreign_key="event.id")
 
 
 class Outcome(OutcomeBase, table=True):
@@ -31,6 +31,7 @@ class Outcome(OutcomeBase, table=True):
 
     # Relationship back to the Event
     event: "Event" = Relationship(back_populates="outcomes")
+    shares: list["Share"] = Relationship(back_populates="outcome")
 
 
 class OutcomeRead(OutcomeBase):
@@ -40,16 +41,19 @@ class OutcomeRead(OutcomeBase):
 # --- 3. USER MODELS ---
 
 
-def get_random_icon():
-    random_seed = uuid.uuid4().hex
-    return f"https://api.dicebear.com/9.x/bottts/svg?seed={random_seed}"
-
-
 class UserBase(SQLModel):
     username: str = Field(index=True, unique=True)
     balance: float = Field(default=100.0)
-    # default_factory calls the function every time a new User is initialized
-    icon_url: str = Field(default=get_random_icon())
+    icon_url: str | None = Field(default=None)  # Start as None
+
+    @model_validator(mode="after")
+    def set_default_icon(self) -> "UserBase":
+        if not self.icon_url:
+            # You can use the username as the seed so the icon is consistent
+            self.icon_url = (
+                f"https://api.dicebear.com/9.x/bottts/svg?seed={self.username}"
+            )
+        return self
 
 
 class User(UserBase, table=True):
@@ -60,7 +64,7 @@ class User(UserBase, table=True):
     admin: bool = Field(default=False)
 
     # Relationships
-    shares: List["Share"] = Relationship(back_populates="user")
+    shares: list["Share"] = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):
@@ -76,6 +80,7 @@ class UserRead(UserBase):
 
 class EventBase(SQLModel):
     title: str
+    description: str
     start_time: datetime
     end_time: datetime
     type: eventType
@@ -89,12 +94,12 @@ class Event(EventBase, table=True):
         default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
     )
 
-    shares: List["Share"] = Relationship(back_populates="event")
-    outcomes: List["Outcome"] = Relationship(back_populates="event")
+    shares: list["Share"] = Relationship(back_populates="event")
+    outcomes: list["Outcome"] = Relationship(back_populates="event")
 
 
 class EventCreate(EventBase):
-    outcomes: List[OutcomeBase]
+    outcomes: list[OutcomeBase]
 
 
 # --- 5. SHARE MODELS ---
@@ -109,11 +114,13 @@ class ShareBase(SQLModel):
     wager: float
     event_id: str = Field(foreign_key="event.id")
     user_id: str = Field(foreign_key="user.id")
+    outcome_id: str = Field(foreign_key="outcome.id")
 
 
 class Share(ShareBase, table=True):
     # Relationships
     event: Event = Relationship(back_populates="shares")
+    outcome: Outcome = Relationship(back_populates="shares")
     user: User = Relationship(back_populates="shares")
 
 
@@ -125,13 +132,14 @@ class ShareRead(ShareBase):
 
 
 class UserReadWithShares(UserRead):
-    shares: List[ShareRead] = []
+    admin: bool
+    shares: list[ShareRead] = []
 
 
 class EventReadWithShares(EventBase):
     id: str
-    outcomes: List[OutcomeRead] = []
-    shares: List[ShareRead] = []
+    outcomes: list[OutcomeRead] = []
+    shares: list[ShareRead] = []
 
 
 # --- 7. FINALIZATION ---

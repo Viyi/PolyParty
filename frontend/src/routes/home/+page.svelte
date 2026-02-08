@@ -3,6 +3,7 @@
 	import { getEventsEventsGet, getUsersUsersGet } from '../../client';
 	import type { Event, UserRead } from '../../client';
 	import LeaderboardTable from '$lib/components/LeaderboardTable.svelte';
+	import EventTable from '$lib/components/EventTable.svelte';
 
 	let events = $state<Event[]>([]);
 	let users = $state<UserRead[]>([]);
@@ -39,8 +40,7 @@
 <div class="gap-4 p-4 auto-rows grid grid-cols-3">
 	<div class="card bg-base-200 shadow-lg col-span-2 row-span-2 border-1">
 		<div class="card-body">
-			<h2 class="card-title text-3xl">Analytics</h2>
-			<p>Events go here!</p>
+			<EventTable />
 		</div>
 	</div>
 

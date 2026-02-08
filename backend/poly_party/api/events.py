@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from datetime import datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from poly_party.db import get_session
@@ -9,22 +9,24 @@ from poly_party.models import (
     EventReadWithShares,
     Outcome,
     Share,
-    ShareRead,
     User,
 )
 from poly_party.security import get_current_user
+from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
 
 router = APIRouter()
 
 
-# 1. View all Events
-@router.get("/", response_model=list[Event])
+@router.get("/", response_model=list[EventReadWithShares])  # 1. Update response model
 def get_events(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    return session.exec(select(Event)).all()
+    statement = select(Event).options(
+        selectinload(Event.shares), selectinload(Event.outcomes)
+    )
+    return session.exec(statement).all()
 
 
 # 2. View a specific Event and all its tied Shares
@@ -46,6 +48,14 @@ def create_event(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
+    existing_event = session.exec(
+        select(Event).where(Event.title == event_data.title)
+    ).first()
+    if existing_event:
+        raise HTTPException(
+            status_code=400, detail="Event of that name already registered."
+        )
+
     # 1. Extract the outcomes data separately
     event_dict = event_data.model_dump(exclude={"outcomes"})
 
@@ -65,14 +75,15 @@ def create_event(
     return db_event
 
 
-@router.post("/bet", response_model=List[ShareRead])
+@router.post("/bet", response_model=list[Share])
 def place_bet(
-    event_id: int,
+    event_id: str,
+    outcome_id: str,
     quantity: int = Body(..., embed=True),
-    price_per_share: float = Body(..., embed=True),
+    expected_price: float = Body(..., embed=True),
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
-) -> list[ShareRead]:
+) -> list[Share]:
     db_event: Event | None = session.get(Event, event_id)
     if not db_event or not db_event.id:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -80,8 +91,15 @@ def place_bet(
     if db_event and db_event.finalized:
         raise HTTPException(status_code=400, detail="Event is already finalized")
 
+    db_outcome: Outcome | None = session.get(Outcome, outcome_id)
+    if not db_outcome:
+        raise HTTPException(status_code=404, detail="Outcome not found")
+
+    if db_outcome.cost > expected_price:
+        raise HTTPException(status_code=400, detail="Cost has increased.")
+
     # 2. Check User Balance
-    total_cost = quantity * price_per_share
+    total_cost = quantity * db_outcome.cost
     if current_user.balance < total_cost:
         raise HTTPException(status_code=400, detail="Insufficient balance")
 
@@ -95,7 +113,8 @@ def place_bet(
         share = Share(
             id=str(uuid.uuid4()),  # Generating unique IDs for each share
             value=db_event.value,  # Inheriting value logic from the event
-            wager=price_per_share,
+            outcome_id=outcome_id,
+            wager=expected_price,
             event_id=db_event.id,
             user_id=current_user.id,
             timestamp=datetime.utcnow(),

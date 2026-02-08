@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session, select
-
 from poly_party.db import get_session
 from poly_party.models import User, UserCreate, UserRead
 from poly_party.security import (
@@ -10,6 +8,7 @@ from poly_party.security import (
     hash_password,
     verify_password,
 )
+from sqlmodel import Session, select
 
 router = APIRouter()
 
@@ -62,7 +61,7 @@ def login(
     return {"access_token": access_token, "token_type": "bearer", "user_id": user.id}
 
 
-def create_admin(username: str, password: str, session: Session):
+def create_user_locally(username: str, password: str, admin: bool, session: Session):
     existing_user = session.exec(select(User).where(User.username == username)).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -73,8 +72,9 @@ def create_admin(username: str, password: str, session: Session):
         username=username,
         hashed_password=hashed,
         balance=100,
-        admin=True,
+        admin=admin,
     )
+
     session.add(new_user)
     session.commit()
     session.refresh(new_user)

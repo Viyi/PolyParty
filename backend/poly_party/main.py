@@ -1,9 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from poly_party.api import auth, events, users
-from poly_party.config import settings
 from poly_party.db import create_db_and_tables, get_session
+from poly_party.db_initialization import create_example_event, create_example_users
 
 app = FastAPI(title="FastAPI + SQLModel Auth")
 
@@ -22,12 +21,8 @@ def on_startup():
     create_db_and_tables()
     session = next(get_session())
 
-    try:
-        auth.create_admin(
-            username="admin", password=settings.admin_pass, session=session
-        )
-    except HTTPException:
-        pass
+    create_example_users(session)
+    create_example_event(session)
 
 
 # Include Routers
