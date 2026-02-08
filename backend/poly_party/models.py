@@ -39,6 +39,17 @@ class OutcomeRead(OutcomeBase):
 
 # --- 3. USER MODELS ---
 
+class TokenBase(SQLModel):
+    token: str = Field(index=True, unique=True)
+    used: bool = Field(default=False)
+
+class Token(TokenBase, table=True):
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True
+    )
+    token: str = Field(index=True, unique=True)
+    used: bool = Field(default=False)
+
 
 def get_random_icon():
     random_seed = uuid.uuid4().hex

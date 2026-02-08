@@ -3,13 +3,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
 from poly_party.db import get_session
-from poly_party.models import User, UserCreate, UserRead
+from poly_party.models import User, UserCreate, UserRead, Token, TokenBase
 from poly_party.security import (
     create_access_token,
     get_current_user,
     hash_password,
     verify_password,
 )
+import string
+import random
 
 router = APIRouter()
 
@@ -41,6 +43,41 @@ def register_user(
     session.commit()
     session.refresh(new_user)
     return new_user
+
+def random_token(length=4):
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
+
+
+@router.get("/register/token", response_model=TokenBase)
+def register_new_token(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    raise_not_admin(current_user)
+
+    unique = False
+    token = ""
+
+    while not unique:
+        new_token = random_token()
+
+        existing_token = session.exec(
+            select(Token).where(Token.token == new_token)
+        ).first()
+        print(existing_token)
+        if not existing_token:
+            token = new_token
+            unique = True
+
+    new_token = Token(
+        token=token,
+        used=False
+    )
+    session.add(new_token)
+    session.commit()
+    session.refresh(new_token)
+    return new_token
 
 
 @router.post("/login")
