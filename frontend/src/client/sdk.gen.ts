@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, RegisterNewTokenAuthRegisterTokenGetData, RegisterNewTokenAuthRegisterTokenGetResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
+import type { CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, PostIconUsersIconPostData, PostIconUsersIconPostErrors, PostIconUsersIconPostResponses, RegisterNewTokenAuthRegisterTokenGetData, RegisterNewTokenAuthRegisterTokenGetResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -78,6 +78,19 @@ export const getUserUsersCurrentGet = <ThrowOnError extends boolean = false>(opt
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/current',
     ...options
+});
+
+/**
+ * Post Icon
+ */
+export const postIconUsersIconPost = <ThrowOnError extends boolean = false>(options: Options<PostIconUsersIconPostData, ThrowOnError>) => (options.client ?? client).post<PostIconUsersIconPostResponses, PostIconUsersIconPostErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/icon',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

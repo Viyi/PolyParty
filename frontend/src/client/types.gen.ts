@@ -184,6 +184,20 @@ export type HttpValidationError = {
 };
 
 /**
+ * IconCreate
+ */
+export type IconCreate = {
+    /**
+     * Icon Url
+     */
+    icon_url: string;
+    /**
+     * Random
+     */
+    random: boolean;
+};
+
+/**
  * OutcomeBase
  */
 export type OutcomeBase = {
@@ -297,6 +311,20 @@ export type ShareRead = {
      * Outcome Id
      */
     outcome_id: string;
+};
+
+/**
+ * TokenBase
+ */
+export type TokenBase = {
+    /**
+     * Token
+     */
+    token: string;
+    /**
+     * Used
+     */
+    used?: boolean;
 };
 
 /**
@@ -551,6 +579,31 @@ export type GetUserUsersCurrentGetResponses = {
 };
 
 export type GetUserUsersCurrentGetResponse = GetUserUsersCurrentGetResponses[keyof GetUserUsersCurrentGetResponses];
+
+export type PostIconUsersIconPostData = {
+    body: IconCreate;
+    path?: never;
+    query?: never;
+    url: '/users/icon';
+};
+
+export type PostIconUsersIconPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PostIconUsersIconPostError = PostIconUsersIconPostErrors[keyof PostIconUsersIconPostErrors];
+
+export type PostIconUsersIconPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserRead;
+};
+
+export type PostIconUsersIconPostResponse = PostIconUsersIconPostResponses[keyof PostIconUsersIconPostResponses];
 
 export type GetEventsEventsGetData = {
     body?: never;

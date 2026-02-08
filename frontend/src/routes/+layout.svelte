@@ -6,6 +6,7 @@
 
 	import { client } from '../client/client.gen';
 	import { API_HOST } from '../conts';
+	import UserSettings from '$lib/components/UserSettings.svelte';
 
 	let { children } = $props();
 	let isReady = $state(false);
@@ -33,6 +34,7 @@
 </svelte:head>
 
 <nav>
+	<UserSettings />
 	<ThemeDropdown />
 </nav>
 
