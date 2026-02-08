@@ -22,9 +22,11 @@ def create_example_users(session: Session):
 
 
 def create_example_event(session: Session):
-    outcome_yes = OutcomeBase(description="Liam maintains interest.", value=0, cost=1.0)
+    outcome_yes = OutcomeBase(
+        description="Liam maintains interest.", value=0, cost=0.50
+    )
 
-    outcome_no = OutcomeBase(description="Liam loses interest.", value=1, cost=0.0)
+    outcome_no = OutcomeBase(description="Liam loses interest.", value=1, cost=0.50)
 
     # 2. Define the EventCreate object
     example_event = EventCreate(
@@ -43,7 +45,7 @@ def create_example_event(session: Session):
         test_user = session.exec(select(User).where(User.username == "greg")).first()
 
         _ = place_bet(
-            event.id, event.outcomes[0].id, 3, 1.00, session, current_user=test_user
+            event.id, event.outcomes[0].id, 1, 1.00, session, current_user=test_user
         )
 
     except HTTPException:

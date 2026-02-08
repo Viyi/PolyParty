@@ -210,7 +210,7 @@ def calculate_outcome_costs(
             current_price = temp_outcome_shares / temp_total_event_shares
 
         # Clamp price between a small minimum and $1.00
-        current_price = max(0.01, min(current_price, 1.00))
+        current_price = max(0.01, min(current_price, 0.99))
 
         prices.append(current_price)
         total_cost += current_price
