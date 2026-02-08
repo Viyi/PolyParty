@@ -24,7 +24,12 @@
 				body: formData.toString()
 			});
 
-			if (!response.ok) throw new Error('login failed');
+			if (!response.ok){
+				alert('Login failed')
+				username = ""
+				password = ""
+				throw new Error('login failed');
+			}
 
 			const data = await response.json();
 

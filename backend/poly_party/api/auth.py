@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
 from poly_party.db import get_session
-from poly_party.models import User, UserCreate, UserRead, Token, TokenBase
+from poly_party.models import User, UserCreate, UserRead, Token, TokenBase, get_random_icon
 from poly_party.security import (
     create_access_token,
     get_current_user,
@@ -50,7 +50,7 @@ def register_user(
     new_user = User(
         username=user_data.username,
         hashed_password=hashed,
-        icon_url=user_data.icon_url,
+        icon_url=get_random_icon(),
         balance=100,
         admin=False,
     )

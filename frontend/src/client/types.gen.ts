@@ -172,6 +172,20 @@ export type HttpValidationError = {
 };
 
 /**
+ * IconCreate
+ */
+export type IconCreate = {
+    /**
+     * Icon Url
+     */
+    icon_url: string;
+    /**
+     * Random
+     */
+    random: boolean;
+};
+
+/**
  * OutcomeBase
  */
 export type OutcomeBase = {
@@ -250,6 +264,20 @@ export type ShareRead = {
 };
 
 /**
+ * TokenBase
+ */
+export type TokenBase = {
+    /**
+     * Token
+     */
+    token: string;
+    /**
+     * Used
+     */
+    used?: boolean;
+};
+
+/**
  * UserCreate
  */
 export type UserCreate = {
@@ -269,6 +297,10 @@ export type UserCreate = {
      * Password
      */
     password: string;
+    /**
+     * Token
+     */
+    token: string;
 };
 
 /**
@@ -381,6 +413,22 @@ export type RegisterUserAuthRegisterPostResponses = {
 
 export type RegisterUserAuthRegisterPostResponse = RegisterUserAuthRegisterPostResponses[keyof RegisterUserAuthRegisterPostResponses];
 
+export type RegisterNewTokenAuthRegisterTokenGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/register/token';
+};
+
+export type RegisterNewTokenAuthRegisterTokenGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: TokenBase;
+};
+
+export type RegisterNewTokenAuthRegisterTokenGetResponse = RegisterNewTokenAuthRegisterTokenGetResponses[keyof RegisterNewTokenAuthRegisterTokenGetResponses];
+
 export type LoginAuthLoginPostData = {
     body: BodyLoginAuthLoginPost;
     path?: never;
@@ -457,7 +505,6 @@ export type GetUserUsersCurrentGetData = {
     path?: never;
     query?: never;
     url: '/users/current';
-    admin: boolean;
 };
 
 export type GetUserUsersCurrentGetResponses = {
@@ -468,6 +515,31 @@ export type GetUserUsersCurrentGetResponses = {
 };
 
 export type GetUserUsersCurrentGetResponse = GetUserUsersCurrentGetResponses[keyof GetUserUsersCurrentGetResponses];
+
+export type PostIconUsersIconPostData = {
+    body: IconCreate;
+    path?: never;
+    query?: never;
+    url: '/users/icon';
+};
+
+export type PostIconUsersIconPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PostIconUsersIconPostError = PostIconUsersIconPostErrors[keyof PostIconUsersIconPostErrors];
+
+export type PostIconUsersIconPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserRead;
+};
+
+export type PostIconUsersIconPostResponse = PostIconUsersIconPostResponses[keyof PostIconUsersIconPostResponses];
 
 export type GetEventsEventsGetData = {
     body?: never;

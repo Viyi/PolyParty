@@ -82,6 +82,9 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     id: str
 
+class IconCreate(SQLModel):
+    icon_url: str
+    random: bool
 
 # --- 4. EVENT MODELS ---
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getUserUsersCurrentGet } from '../../client';
-	import type { UserRead } from '../../client';
+	import { getUserUsersCurrentGet, postIconUsersIconPost } from '../../client';
+	import type { IconCreate, PostIconUsersIconPostData, UserRead } from '../../client';
 	import { client } from '../../client/client.gen';
 	import UserIcon from './UserIcon.svelte';
 
@@ -9,6 +9,7 @@
 	let user: UserRead | null = null
 	let showSettings: boolean = false
 	let icon_url: string | null = null
+	let new_icon_url: string | null = null
 	// let loading = $state(true);
 
 	onMount(async () => {
@@ -33,6 +34,40 @@
 		}
 	});
 
+	const handleIconChange = async (url: string | null = null, random: boolean = false): Promise<UserRead | null> => {
+		try {
+			if (url || random){
+				const data: IconCreate = {icon_url: url ? url : "", random: random}
+				const res = await postIconUsersIconPost({body: data})
+				return res.data
+			}
+		} catch {
+			console.log("Request error")
+			return null
+		}
+
+	}
+
+	const updateIcon = async () => {
+		const res = await handleIconChange(new_icon_url)
+		if (res){
+			user = res
+		}
+		new_icon_url = null
+		showSettings = false
+	}
+	
+	const updateRandomIcon = async () => {
+		const res = await handleIconChange(null, true)
+		if (res){
+			user = res
+		}
+		new_icon_url = null
+		showSettings = false
+	}
+
+	
+
 	const toggleSettings = () => showSettings = !showSettings
 </script>
 
@@ -45,14 +80,17 @@
 		${user ? user.balance?.toLocaleString() ?? 0 : 0}
 	</span>
 	{#if showSettings}
-	<div class="settings-float">
+	<div class="settings-float bg-base-200">
 		<label style="width: 90%;" for="icon-url">Change Icon</label>
 		<input 
 			id="icon-url"
-			bind:value={icon_url}
+			bind:value={new_icon_url}
 			type="text"
 			style="max-width: 90%; min-width: 90%;"
 		>
+		<button on:click={updateIcon}>Submit Icon</button>
+		<label style="width: 90%;" for="icon-url">Random Icon</label>
+		<button on:click={updateRandomIcon}>Generate Icon</button>
 	</div>
 	{/if}
 </div>
@@ -73,12 +111,12 @@
 		position: absolute;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: start;
 		text-align: left;
+		gap: 8px;
 		width: 200px;
 		height: 300px;
 		top: 100%;
-		background-color: red;
 		z-index: 10;
 		border-radius: 0 5px 5px 5px;
 		padding: 12px;

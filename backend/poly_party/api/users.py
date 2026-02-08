@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from poly_party.db import get_session
-from poly_party.models import User, UserRead, UserReadWithShares
+from poly_party.models import User, UserRead, UserReadWithShares, IconCreate, get_random_icon
 from poly_party.security import (
     get_current_user,
 )
@@ -37,4 +37,19 @@ def get_user(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
+    return current_user
+
+@router.post("/icon", response_model=UserRead)
+def post_icon(
+    icon: IconCreate,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    if not icon.random:
+        current_user.icon_url = icon.icon_url
+    else:
+        current_user.icon_url = get_random_icon()
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
     return current_user
