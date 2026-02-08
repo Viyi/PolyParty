@@ -22,7 +22,22 @@ def register_user(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    raise_not_admin(current_user)
+    admin = check_admin(current_user)
+
+    if not admin:
+        existing_token = session.exec(
+            select(Token).where((Token.token == user_data.token) & (Token.used == False))
+        ).first()
+        if not existing_token:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Register token is invalid",
+            )
+            return
+        existing_token.used = True
+        session.add(existing_token)
+        session.commit()
+        session.refresh(existing_token)
 
     existing_user = session.exec(
         select(User).where(User.username == user_data.username)
@@ -117,6 +132,9 @@ def create_admin(username: str, password: str, session: Session):
     session.refresh(new_user)
     return new_user
 
+
+def check_admin(current_user: User) -> bool:
+    return current_user.admin
 
 def raise_not_admin(current_user: User):
     if not current_user.admin:

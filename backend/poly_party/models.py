@@ -76,6 +76,7 @@ class User(UserBase, table=True):
 
 class UserCreate(UserBase):
     password: str
+    token: str
 
 
 class UserRead(UserBase):
