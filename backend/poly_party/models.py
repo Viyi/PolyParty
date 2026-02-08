@@ -49,7 +49,7 @@ class UserBase(SQLModel):
     username: str = Field(index=True, unique=True)
     balance: float = Field(default=100.0)
     # default_factory calls the function every time a new User is initialized
-    icon_url: str = Field(default_factory=get_random_icon)
+    icon_url: str = Field(default=get_random_icon())
 
 
 class User(UserBase, table=True):

@@ -33,6 +33,7 @@ def register_user(
     new_user = User(
         username=user_data.username,
         hashed_password=hashed,
+        icon_url=user_data.icon_url,
         balance=100,
         admin=False,
     )
