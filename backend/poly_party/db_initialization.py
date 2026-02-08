@@ -35,7 +35,7 @@ def create_example_event(session: Session):
         start_time=datetime.utcnow(),
         end_time=datetime.utcnow() + timedelta(hours=1),
         type=eventType.SINGLETON,
-        value=100,
+        value=1,
         first_share_bonus=5.0,
         finalized=False,
         outcomes=[outcome_yes, outcome_no],

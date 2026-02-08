@@ -122,7 +122,6 @@
 	<h2 class="text-2xl font-bold mb-4">Events</h2>
 	<div class="p-4 w-full overflow-x-auto">
 		<div class="mb-6 flex items-center justify-between">
-			<h2 class="text-2xl font-bold">Events</h2>
 			{#if admin}
 				<button class="btn btn-primary btn-sm" onclick={() => createModal.show()}>
 					+ New Event
@@ -168,6 +167,9 @@
 										class="gap-4 py-1 border-base-content/5 flex items-center justify-between border-b last:border-0"
 									>
 										<span class="text-sm font-medium">
+											{#if e.finalized && e.value == outcome.value}
+												✅
+											{/if}
 											{outcome.description}
 										</span>
 
