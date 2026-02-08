@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { CloseEventEventsEventsEventIdClosePostData, CloseEventEventsEventsEventIdClosePostErrors, CloseEventEventsEventsEventIdClosePostResponses, CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetOutcomeCostsEventsBetCostPostData, GetOutcomeCostsEventsBetCostPostErrors, GetOutcomeCostsEventsBetCostPostResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, PostIconUsersIconPostData, PostIconUsersIconPostErrors, PostIconUsersIconPostResponses, RegisterNewTokenAuthRegisterTokenGetData, RegisterNewTokenAuthRegisterTokenGetResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
+import type { CloseEventEventsEventIdClosePostData, CloseEventEventsEventIdClosePostErrors, CloseEventEventsEventIdClosePostResponses, CreateEventEventsCreatePostData, CreateEventEventsCreatePostErrors, CreateEventEventsCreatePostResponses, GetEventDetailsEventsEventIdGetData, GetEventDetailsEventsEventIdGetErrors, GetEventDetailsEventsEventIdGetResponses, GetEventsEventsGetData, GetEventsEventsGetResponses, GetOutcomeCostsEventsBetCostPostData, GetOutcomeCostsEventsBetCostPostErrors, GetOutcomeCostsEventsBetCostPostResponses, GetUserSharesUsersUserIdSharesGetData, GetUserSharesUsersUserIdSharesGetErrors, GetUserSharesUsersUserIdSharesGetResponses, GetUsersUsersGetData, GetUsersUsersGetResponses, GetUserUsersCurrentGetData, GetUserUsersCurrentGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, PlaceBetEventsBetPostData, PlaceBetEventsBetPostErrors, PlaceBetEventsBetPostResponses, PostIconUsersIconPostData, PostIconUsersIconPostErrors, PostIconUsersIconPostResponses, RegisterNewTokenAuthRegisterTokenGetData, RegisterNewTokenAuthRegisterTokenGetResponses, RegisterUserAuthRegisterPostData, RegisterUserAuthRegisterPostErrors, RegisterUserAuthRegisterPostResponses, RootGetData, RootGetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -149,9 +149,9 @@ export const getOutcomeCostsEventsBetCostPost = <ThrowOnError extends boolean = 
 /**
  * Close Event
  */
-export const closeEventEventsEventsEventIdClosePost = <ThrowOnError extends boolean = false>(options: Options<CloseEventEventsEventsEventIdClosePostData, ThrowOnError>) => (options.client ?? client).post<CloseEventEventsEventsEventIdClosePostResponses, CloseEventEventsEventsEventIdClosePostErrors, ThrowOnError>({
+export const closeEventEventsEventIdClosePost = <ThrowOnError extends boolean = false>(options: Options<CloseEventEventsEventIdClosePostData, ThrowOnError>) => (options.client ?? client).post<CloseEventEventsEventIdClosePostResponses, CloseEventEventsEventIdClosePostErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/events/events/{event_id}/close',
+    url: '/events/{event_id}/close',
     ...options,
     headers: {
         'Content-Type': 'application/json',

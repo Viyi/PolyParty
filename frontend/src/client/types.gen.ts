@@ -5,9 +5,9 @@ export type ClientOptions = {
 };
 
 /**
- * Body_close_event_events_events__event_id__close_post
+ * Body_close_event_events__event_id__close_post
  */
-export type BodyCloseEventEventsEventsEventIdClosePost = {
+export type BodyCloseEventEventsEventIdClosePost = {
     /**
      * Winning Value
      */
@@ -750,8 +750,8 @@ export type GetOutcomeCostsEventsBetCostPostResponses = {
 
 export type GetOutcomeCostsEventsBetCostPostResponse = GetOutcomeCostsEventsBetCostPostResponses[keyof GetOutcomeCostsEventsBetCostPostResponses];
 
-export type CloseEventEventsEventsEventIdClosePostData = {
-    body: BodyCloseEventEventsEventsEventIdClosePost;
+export type CloseEventEventsEventIdClosePostData = {
+    body: BodyCloseEventEventsEventIdClosePost;
     path: {
         /**
          * Event Id
@@ -759,19 +759,19 @@ export type CloseEventEventsEventsEventIdClosePostData = {
         event_id: string;
     };
     query?: never;
-    url: '/events/events/{event_id}/close';
+    url: '/events/{event_id}/close';
 };
 
-export type CloseEventEventsEventsEventIdClosePostErrors = {
+export type CloseEventEventsEventIdClosePostErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type CloseEventEventsEventsEventIdClosePostError = CloseEventEventsEventsEventIdClosePostErrors[keyof CloseEventEventsEventsEventIdClosePostErrors];
+export type CloseEventEventsEventIdClosePostError = CloseEventEventsEventIdClosePostErrors[keyof CloseEventEventsEventIdClosePostErrors];
 
-export type CloseEventEventsEventsEventIdClosePostResponses = {
+export type CloseEventEventsEventIdClosePostResponses = {
     /**
      * Successful Response
      */

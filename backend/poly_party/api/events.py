@@ -222,7 +222,7 @@ def calculate_outcome_costs(
     return prices
 
 
-@router.post("/events/{event_id}/close")
+@router.post("/{event_id}/close")
 def close_event(
     event_id: str,
     winning_value: int = Body(..., embed=True),

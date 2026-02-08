@@ -1,19 +1,46 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getEventsEventsGet } from '../../client';
+	import { getEventsEventsGet, getUserUsersCurrentGet } from '../../client';
 	// Ensure you import the type that includes outcomes (EventReadWithShares)
 	// or extend the generated Event type.
-	import type { EventReadWithShares as dbEvent } from '../../client';
-	import BetDialog from './BetDialog.svelte';
+	import {
+		type EventReadWithShares as dbEvent,
+		closeEventEventsEventIdClosePost
+	} from '../../client';
 
+	async function handleCloseEvent(eventId: string, outcomeValue: number) {
+		if (!confirm('Are you sure you want to close this event and pay out winners?')) return;
+
+		try {
+			// Using the endpoint you created earlier
+			const res = await closeEventEventsEventIdClosePost({
+				path: { event_id: eventId },
+				body: { winning_value: outcomeValue }
+			});
+
+			if (res.data) {
+				// Update local state so the badge turns red immediately
+				events = events.map((ev) => (ev.id === eventId ? { ...ev, finalized: true } : ev));
+				alert(`Event closed! Shares paid: ${res.data.shares_paid}`);
+			}
+		} catch (err) {
+			console.error(err);
+			alert('Failed to close event.');
+		}
+	}
 	let events = $state<dbEvent[]>([]);
 	let loading = $state(true);
-
+	let admin = $state(false);
 	onMount(async () => {
 		try {
 			const res = await getEventsEventsGet();
 			if (res.data) {
 				events = res.data;
+			}
+
+			const userRes = await getUserUsersCurrentGet();
+			if (userRes.data) {
+				admin = userRes.data.admin;
 			}
 		} finally {
 			loading = false;
@@ -98,6 +125,9 @@
 					<th>Potential Outcomes</th>
 					<th>Cutoff</th>
 					<th>Status</th>
+					{#if admin}
+						<th>Admin</th>
+					{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -138,10 +168,30 @@
 								<span class="badge badge-success">Open</span>
 							{/if}
 						</td>
-
-						<td>
-							<button onclick={() => handleBetDialog(e)}>-></button>
-						</td>
+						{#if admin}
+							<td>
+								{#if e.finalized}
+									<button class="btn btn-disabled btn-xs">Finalized</button>
+								{:else}
+									<div class="join border-base-content/10 border">
+										<select
+											class="select select-bordered select-xs join-item focus:outline-none"
+											onchange={(el) => {
+												const val = parseInt(el.currentTarget.value);
+												if (!isNaN(val)) handleCloseEvent(e.id, val);
+											}}
+										>
+											<option disabled selected>Pick Winner</option>
+											{#each e.outcomes as outcome}
+												<option value={outcome.value}>
+													{outcome.description}
+												</option>
+											{/each}
+										</select>
+									</div>
+								{/if}
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>
